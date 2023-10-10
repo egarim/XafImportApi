@@ -3,6 +3,7 @@ using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.DC;
 using DevExpress.ExpressApp.Xpo;
 using DevExpress.Pdf.Native.BouncyCastle.Utilities;
+using DevExpress.Persistent.BaseImpl;
 using DevExpress.Xpo;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace XafImportApi.Module.Import
     }
     public class RowDef
     {
-
+        public string ObjectType { get; set; }
         public Dictionary<int, PropertyInfo> Properties { get; set; }
         public List<List<object>> Rows { get; set; }
     }
@@ -47,6 +48,22 @@ namespace XafImportApi.Module.Import
                 Collections.Add(RefProp.Value, BuildCollection(RefProp, rowDef, XpOs.Session, TypesInfo, PageSize, Pages));
             }
             XpOs.Session.BulkLoad(Collections.Select(c => c.Value).ToArray());
+            foreach (List<object> Row in rowDef.Rows)
+            {
+                var Instance=objectSpace.CreateObject(TypesInfo.FindTypeInfo(rowDef.ObjectType).Type) as XPCustomObject;
+                for (int i = 0; i < Row.Count; i++)
+                {
+                    if(rowDef.Properties[i].PropertyKind==PropertyKind.Primitive)
+                        Instance.SetMemberValue(rowDef.Properties[i].Name, Row[i]);
+                    else
+                    {
+                        Collections[rowDef.Properties[i]].Filter= new BinaryOperator(rowDef.Properties[i].Name, Row[i]);
+                        Instance.SetMemberValue(rowDef.Properties[i].Name, Collections[rowDef.Properties[i]][0]);
+                    }
+
+                }
+            }
+            objectSpace.CommitChanges();
 
         }
         XPCollection BuildCollection(KeyValuePair<int, PropertyInfo> RefProperties, RowDef rowDef, Session session, ITypesInfo TypesInfo, int pageSize, int pages)
