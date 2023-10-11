@@ -1,9 +1,11 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Blazor.DesignTime;
 using DevExpress.ExpressApp.Blazor.Services;
 using DevExpress.ExpressApp.Design;
 using DevExpress.ExpressApp.Utils;
+using DevExpress.Xpo.DB;
 
 namespace XafImportApi.Blazor.Server;
 
@@ -11,8 +13,15 @@ public class Program : IDesignTimeApplicationFactory {
     private static bool ContainsArgument(string[] args, string argument) {
         return args.Any(arg => arg.TrimStart('/').TrimStart('-').ToLower() == argument.ToLower());
     }
+    private static void EnableXpoDebugLog()
+    {
+        FieldInfo xpoSwitchF = typeof(ConnectionProviderSql).GetField("xpoSwitch", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+        TraceSwitch xpoSwitch = (TraceSwitch)xpoSwitchF.GetValue(null);
+        xpoSwitch.Level = TraceLevel.Info;
+    }
     public static int Main(string[] args) {
-        if(ContainsArgument(args, "help") || ContainsArgument(args, "h")) {
+        EnableXpoDebugLog();
+        if (ContainsArgument(args, "help") || ContainsArgument(args, "h")) {
             Console.WriteLine("Updates the database when its version does not match the application's version.");
             Console.WriteLine();
             Console.WriteLine($"    {Assembly.GetExecutingAssembly().GetName().Name}.exe --updateDatabase [--forceUpdate --silent]");

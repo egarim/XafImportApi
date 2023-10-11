@@ -34,6 +34,11 @@ namespace XafImportApi.Module.BusinessObjects
             // Place your initialization code here (https://documentation.devexpress.com/eXpressAppFramework/CustomDocument112834.aspx).
         }
 
+        RefObject5 refProp5;
+        RefObject4 refProp4;
+        RefObject3 refProp3;
+        RefObject2 refProp2;
+        RefObject1 refProp1;
         bool active;
         DateTime date;
         string name;
@@ -50,11 +55,42 @@ namespace XafImportApi.Module.BusinessObjects
             get => date;
             set => SetPropertyValue(nameof(Date), ref date, value);
         }
-        
+
         public bool Active
         {
             get => active;
             set => SetPropertyValue(nameof(Active), ref active, value);
+        }
+
+        public RefObject1 RefProp1
+        {
+            get => refProp1;
+            set => SetPropertyValue(nameof(RefProp1), ref refProp1, value);
+        }
+
+        public RefObject2 RefProp2
+        {
+            get => refProp2;
+            set => SetPropertyValue(nameof(RefProp2), ref refProp2, value);
+        }
+
+        public RefObject3 RefProp3
+        {
+            get => refProp3;
+            set => SetPropertyValue(nameof(RefProp3), ref refProp3, value);
+        }
+
+        public RefObject4 RefProp4
+        {
+            get => refProp4;
+            set => SetPropertyValue(nameof(RefProp4), ref refProp4, value);
+        }
+        
+        public RefObject5 RefProp5
+
+        {
+            get => refProp5;
+            set => SetPropertyValue(nameof(RefProp5), ref refProp5, value);
         }
     }
 }

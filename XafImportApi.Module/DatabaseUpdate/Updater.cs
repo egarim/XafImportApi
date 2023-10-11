@@ -63,16 +63,19 @@ public class Updater : ModuleUpdater {
         adminRole.IsAdministrative = true;
 		userAdmin.Roles.Add(adminRole);
         
-
-        for (int i = 0; i < 20000; i++)
+        if(this.ObjectSpace.GetObjectsCount(typeof(RefObject1),null)==0)
         {
+            for (int i = 0; i < 20000; i++)
+            {
 
-            CreateRefObject(typeof(RefObject1), i.ToString());
-            CreateRefObject(typeof(RefObject2), i.ToString());
-            CreateRefObject(typeof(RefObject3), i.ToString());
-            CreateRefObject(typeof(RefObject4), i.ToString());
-            CreateRefObject(typeof(RefObject5), i.ToString());
+                CreateRefObject(typeof(RefObject1), i.ToString());
+                CreateRefObject(typeof(RefObject2), i.ToString());
+                CreateRefObject(typeof(RefObject3), i.ToString());
+                CreateRefObject(typeof(RefObject4), i.ToString());
+                CreateRefObject(typeof(RefObject5), i.ToString());
+            }
         }
+        
         ObjectSpace.CommitChanges(); //This line persists created object(s).
 #endif
     }

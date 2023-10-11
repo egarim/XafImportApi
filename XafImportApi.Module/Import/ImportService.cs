@@ -7,6 +7,7 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Xpo;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,18 +25,19 @@ namespace XafImportApi.Module.Import
         public string Name { get; set; }
         public string PropertyType { get; set; }
         public PropertyKind PropertyKind { get; set; }
+        public string ReferecePropertyLookup { get; set; }
     }
     public class RowDef
     {
         public string ObjectType { get; set; }
-        public Dictionary<int, PropertyInfo> Properties { get; set; }
-        public List<List<object>> Rows { get; set; }
+        public Dictionary<int, PropertyInfo> Properties { get; set; } =new Dictionary<int, PropertyInfo>();
+        public List<List<object>> Rows { get; set; } = new List<List<object>>();
     }
 
 
-    public class ImportHelper
+    public class ImportService
     {
-        void Import(IObjectSpace objectSpace, RowDef rowDef)
+        public void Import(IObjectSpace objectSpace, RowDef rowDef)
         {
             List<KeyValuePair<int, PropertyInfo>> RefProperties = rowDef.Properties.Where(p => p.Value.PropertyKind == PropertyKind.Reference).ToList();
             var XpOs = objectSpace as XPObjectSpace;
@@ -57,7 +59,7 @@ namespace XafImportApi.Module.Import
                         Instance.SetMemberValue(rowDef.Properties[i].Name, Row[i]);
                     else
                     {
-                        Collections[rowDef.Properties[i]].Filter= new BinaryOperator(rowDef.Properties[i].Name, Row[i]);
+                        Collections[rowDef.Properties[i]].Filter= new BinaryOperator(rowDef.Properties[i].ReferecePropertyLookup, Row[i]);
                         Instance.SetMemberValue(rowDef.Properties[i].Name, Collections[rowDef.Properties[i]][0]);
                     }
 
@@ -77,7 +79,7 @@ namespace XafImportApi.Module.Import
             List<CriteriaOperator> operators = new List<CriteriaOperator>();
             for (int i = 0; i < pages; i++)
             {
-                operators.Add(new InOperator(RefProperties.Value.Name, GetValues(rowDef, i, pageSize, RefProperties.Key)));
+                operators.Add(new InOperator(RefProperties.Value.ReferecePropertyLookup, GetValues(rowDef, i, pageSize, RefProperties.Key)));
             }
             return CriteriaOperator.Or(operators);
            
@@ -89,6 +91,7 @@ namespace XafImportApi.Module.Import
         }
         List<Object> GetValues(RowDef rowDef, int page, int pageSize, int ColumIndex)
         {
+            Debug.WriteLine($"Page: {page} ColumIndex: {ColumIndex}");
             return rowDef.Rows
                 .Select(innerList => innerList[ColumIndex])
                 .Skip((page - 1) * pageSize)
